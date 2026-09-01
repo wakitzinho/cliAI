@@ -10,6 +10,21 @@ def args():
     # argument parser
     parser = argparse.ArgumentParser(description="CLI interface for AI")
 
+    # -cs / answer only in code but very optimized code.
+    parser.add_argument(
+        "-cs", "--codeShort",
+        action="store_true",
+        help="Make ai only answer in code but the ai will optimize it."
+    )
+
+    # -c / answer only in code arg
+    parser.add_argument(
+        "-c", "--code",
+        action="store_true",
+        help="Make ai only respond in code."
+
+    )
+
     # -s / --short argument
     parser.add_argument(
         "-s", "--short",
@@ -33,11 +48,16 @@ def args():
 
     user_prompt = " ".join(args.message)
 
-    # --short arg handling
+    # arg handling
 
     system_instruction = ""
     if args.short:
         system_instruction = "IMPORTANT: Keep your response extremely brief, direct, and concise. No conversational fluff. "
+    elif args.code:
+        system_instruction = "IMPORTANT: only respond in code and anything helpful for example how to setup. "
+    elif args.codeShort:
+        system_instruction = "IMPORTANT: only respond in code and anything helpful for example how to setup. Also VERY IMPORTANT the code shall be very optimized and should not have anything unnecessary. "
+
 
     # combine args with full prompt for the AI
     final_prompt = f"{system_instruction}\nUser Question: {user_prompt}"
@@ -60,8 +80,6 @@ def ask(user_input):
     )
     console.print(Markdown(response.text))
 
-#print(Markdown(response.text))
-
 argument_prompt = args()
 print(argument_prompt)
 
@@ -74,4 +92,4 @@ else:
       if user_input == "exit":
           break
 
-      print(ask(user_input))
+      ask(user_input)
