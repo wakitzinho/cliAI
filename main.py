@@ -92,7 +92,7 @@ def ask(user_input):
            )
         )
     )
-    return response.text
+    return response
     #console.print(Markdown(response.text))
 
 # main loop
@@ -100,15 +100,23 @@ def ask(user_input):
 def main():
 
     argument_prompt = args()
-    print(argument_prompt) # if needed for debugging
+    # print(argument_prompt) # if needed for debugging
+
+    # loop if you use the shell for the program
+    if argument_prompt:
+        user_input = argument_prompt
+        response = ask(user_input)
+        console.print(Markdown(response.text))
 
     while True:
+
+        # main loop if you enter by typing "AI"
         user_input = input("> ")
 
         if user_input == "exit":
             break
         response = ask(user_input)
-        console.print(Markdown(response))
+        console.print(Markdown(response.text))
 
 if __name__ == "__main__":
     main()
