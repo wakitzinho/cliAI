@@ -3,29 +3,42 @@ from google.genai import types
 import os
 from rich.console import Console
 from rich.markdown import Markdown
-import sys
 import argparse
 
 def args():
     # argument parser
     parser = argparse.ArgumentParser(description="CLI interface for AI")
 
+    # -i / enter interactive mode
+    parser.add_argument(
+        "-i", "--interactive",
+        action="store_true",
+        help="Will enter the interactive mode. "
+    )
+
+    # -v / answer in detail
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="AI will give a verbose, detailed explanation. "
+    )
+
     # -cs / answer only in code but very optimized code.
     parser.add_argument(
         "-cs", "--codeShort",
         action="store_true",
-        help="Make ai only answer in code but the ai will optimize it."
+        help="Make AI only answer in code but the ai will optimize it."
     )
 
     # -c / answer only in code arg
     parser.add_argument(
         "-c", "--code",
         action="store_true",
-        help="Make ai only respond in code."
+        help="Make AI only respond in code."
 
     )
 
-    # -s / --short argument
+    # -s / --short
     parser.add_argument(
         "-s", "--short",
         action="store_true",
@@ -57,7 +70,8 @@ def args():
         system_instruction = "IMPORTANT: only respond in code and anything helpful for example how to setup. "
     elif args.codeShort:
         system_instruction = "IMPORTANT: only respond in code and anything helpful for example how to setup. Also VERY IMPORTANT the code shall be very optimized and should not have anything unnecessary. "
-
+    elif args.verbose:
+        system_instruction = "IMPORTANT: answer with a detailed and verbose response. "
 
     # combine args with full prompt for the AI
     final_prompt = f"{system_instruction}\nUser Question: {user_prompt}"
@@ -78,18 +92,23 @@ def ask(user_input):
            )
         )
     )
-    console.print(Markdown(response.text))
+    return response.text
+    #console.print(Markdown(response.text))
 
-argument_prompt = args()
-print(argument_prompt)
+# main loop
 
-if argument_prompt:
-    ask(argument_prompt)
-else:
-  while True:
-      user_input = input("> ")
+def main():
 
-      if user_input == "exit":
-          break
+    argument_prompt = args()
+    print(argument_prompt) # if needed for debugging
 
-      ask(user_input)
+    while True:
+        user_input = input("> ")
+
+        if user_input == "exit":
+            break
+        response = ask(user_input)
+        console.print(Markdown(response))
+
+if __name__ == "__main__":
+    main()
