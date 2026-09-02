@@ -9,11 +9,11 @@ def args():
     # argument parser
     parser = argparse.ArgumentParser(description="CLI interface for AI")
 
-    # -i / enter interactive mode
+    # -q / quick question mode
     parser.add_argument(
-        "-i", "--interactive",
+        "-q", "--quick",
         action="store_true",
-        help="Will enter the interactive mode. "
+        help="Stay in shell after the response. "
     )
 
     # -v / answer in detail
@@ -50,7 +50,7 @@ def args():
         "-m", "--message",
         type=str,
         nargs = "+", # allows messages without quotes
-        help="Add message for AI"
+        help="Your message for AI"
     )
 
     args = parser.parse_args()
@@ -62,7 +62,6 @@ def args():
     user_prompt = " ".join(args.message)
 
     # arg handling
-
     system_instruction = ""
     if args.short:
         system_instruction = "IMPORTANT: Keep your response extremely brief, direct, and concise. No conversational fluff. "
@@ -76,7 +75,7 @@ def args():
     # combine args with full prompt for the AI
     final_prompt = f"{system_instruction}\nUser Question: {user_prompt}"
 
-    return final_prompt
+    return final_prompt, args.quick
 
 console = Console()
 
@@ -99,24 +98,34 @@ def ask(user_input):
 
 def main():
 
-    argument_prompt = args()
-    # print(argument_prompt) # if needed for debugging
+    argument_prompt, quick = args()
+    print(argument_prompt, quick) # debugging if i need to
 
-    # loop if you use the shell for the program
+    # if used directly from shell normally
     if argument_prompt:
         user_input = argument_prompt
         response = ask(user_input)
         console.print(Markdown(response.text))
+        return
 
+
+    # if it has quick mode enabled: answer once and return to shell
+    if quick:
+        response = ask(argument_prompt)
+        console.print(Markdown(response.text))
+        return
+
+    # normal mode: use normal loop
     while True:
 
-        # main loop if you enter by typing "AI"
         user_input = input("> ")
 
         if user_input == "exit":
             break
+
         response = ask(user_input)
         console.print(Markdown(response.text))
+
 
 if __name__ == "__main__":
     main()
