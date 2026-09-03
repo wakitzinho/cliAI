@@ -75,7 +75,10 @@ def args():
     # combine args with full prompt for the AI
     final_prompt = f"{system_instruction}\nUser Question: {user_prompt}"
 
+    # return the final prompt
     return final_prompt, args.quick
+
+
 
 console = Console()
 
