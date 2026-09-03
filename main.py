@@ -57,7 +57,9 @@ def args():
 
     # check if a user sent a message
     if not args.message:
-        return None
+        return None, False
+    if not args.quick:
+        return None, False
 
     user_prompt = " ".join(args.message)
 
@@ -102,7 +104,7 @@ def ask(user_input):
 def main():
 
     argument_prompt, quick = args()
-    print(argument_prompt, quick) # debugging if i need to
+    #print(argument_prompt, quick) # debugging if i need to
 
     # if used directly from shell normally
     if argument_prompt:
