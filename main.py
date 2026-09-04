@@ -86,33 +86,41 @@ console = Console()
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
-def ask(user_input):
+def ask(user_input, history=None):
+    """
+    history: list of dicts like {"role": "user"/"model", "parts": [{"text": ...}]}
+    If history is provided, the current user_input is appended to it before
+    sending, and the response is appended back into it for the next call.
+    """
+    if history is None:
+        history = []
+
+    history.append({"role": "user", "parts": [{"text": user_input}]})
+
     response = client.models.generate_content(
         model="gemini-3.6-flash",
-        contents=user_input,
+        contents=history,
         config=types.GenerateContentConfig(
             automatic_function_calling=types.AutomaticFunctionCallingConfig(
                 disable=True
-           )
+            )
         )
     )
+
+    history.append({"role": "model", "parts": [{"text": response.text}]})
     return response
-    #console.print(Markdown(response.text))
+
 
 # main loop
 
 def main():
-
     argument_prompt, quick = args()
-    #print(argument_prompt, quick) # debugging if i need to
 
-    # if used directly from shell normally
+    # if used directly from shell normally (single-shot, no ongoing history needed)
     if argument_prompt:
-        user_input = argument_prompt
-        response = ask(user_input)
+        response = ask(argument_prompt)
         console.print(Markdown(response.text))
         return
-
 
     # if it has quick mode enabled: answer once and return to shell
     if quick:
@@ -120,17 +128,14 @@ def main():
         console.print(Markdown(response.text))
         return
 
-    # normal mode: use normal loop
+    # normal mode: use normal loop, keep history for the session
+    history = []
     while True:
-
         user_input = input("> ")
-
         if user_input == "exit":
             break
-
-        response = ask(user_input)
+        response = ask(user_input, history)
         console.print(Markdown(response.text))
-
 
 if __name__ == "__main__":
     main()
